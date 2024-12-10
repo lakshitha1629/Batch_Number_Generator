@@ -24,13 +24,25 @@ conn.commit()
 # Global countdown variable
 undo_countdown = 10
 
+# Load product types and MRP values
+product_types = {}
+with open("product_types.txt", "r") as file:
+    for line in file:
+        product, price = line.strip().split(",")
+        product_types[product] = price
+
+# Load colors
+color_list = []
+with open("colors.txt", "r") as file:
+    color_list = [line.strip() for line in file]
+
 # Batch number generator
 def generate_batch_number():
     global undo_countdown
     year = datetime.now().year % 100  # Last two digits of the year
     product_type = type_var.get()
     color = color_var.get()
-    mrp = datetime.now().strftime("%Y-%m-%d")  # Default today's date
+    mrp = product_types.get(product_type, "0")  # Get MRP based on product type
     mfd_date = datetime.now().strftime("%Y-%m-%d")  # Today's date as MFD
 
     if not product_type or not color:
@@ -38,7 +50,7 @@ def generate_batch_number():
         return
 
     # Assign type code
-    type_code = "1" if product_type.lower() == "polymer" else "2"
+    type_code = str(list(product_types.keys()).index(product_type) + 1)
 
     # Get color code (position in the color list + 1)
     color_code = str(color_list.index(color) + 1).zfill(2)
@@ -104,21 +116,12 @@ app.title("Batch Number Generator")
 app.geometry("250x220")  # Compact window size
 
 # Set application icon
-app.iconbitmap("app_icon.ico")  # Ensure you have an 'app_icon.ico' file in the same directory
-
-# Color list
-color_list = [
-    "White", "Bone", "Ivory", "Cream", "Off White", "Light Blue", "Blue", "Dark Blue",
-    "Cobalt Blue", "Terracotta", "Peach", "Light Beige", "Beige", "Gold", "Sand Stone",
-    "Light Green", "Green", "Dark Green", "Goma Green", "Sahara Sand", "Silver Gray",
-    "Creamish Gray", "Gray", "Dark Gray", "Black", "Light Pink", "Pink", "Light Brown",
-    "Brown", "Burgundy"
-]
+app.iconbitmap("app_icon.ico")  
 
 # Widgets
 tk.Label(app, text="Product Type").grid(row=0, column=0, padx=5, pady=5, sticky="w")
 type_var = tk.StringVar()
-ttk.Combobox(app, textvariable=type_var, values=["Polymer", "Normal"], width=20).grid(row=0, column=1, padx=5, pady=5)
+ttk.Combobox(app, textvariable=type_var, values=list(product_types.keys()), width=20).grid(row=0, column=1, padx=5, pady=5)
 
 tk.Label(app, text="Color").grid(row=1, column=0, padx=5, pady=5, sticky="w")
 color_var = tk.StringVar()
