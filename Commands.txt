@@ -1,0 +1,1 @@
+pyinstaller --onefile --windowed --icon=app_icon.ico --add-data "colors.txt;." --add-data "product_types.txt;." batch_generator.py

@@ -5,7 +5,7 @@ a = Analysis(
     ['batch_generator.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('colors.txt', '.'), ('product_types.txt', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
