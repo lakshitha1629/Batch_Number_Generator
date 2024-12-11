@@ -1,7 +1,15 @@
+import os
+import sys
 import sqlite3
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
+
+# Get base path depending on execution context
+if hasattr(sys, '_MEIPASS'):
+    base_path = sys._MEIPASS  # Path for bundled executable
+else:
+    base_path = os.path.abspath(".")
 
 # Initialize database
 conn = sqlite3.connect("batch_data.db")
@@ -25,16 +33,19 @@ conn.commit()
 undo_countdown = 10
 
 # Load product types and MRP values
+product_types_file = os.path.join(base_path, "product_types.txt")
 product_types = {}
-with open("product_types.txt", "r") as file:
+with open(product_types_file, "r") as file:
     for line in file:
         product, price = line.strip().split(",")
         product_types[product] = price
 
 # Load colors
+colors_file = os.path.join(base_path, "colors.txt")
 color_list = []
-with open("colors.txt", "r") as file:
+with open(colors_file, "r") as file:
     color_list = [line.strip() for line in file]
+
 
 # Batch number generator
 def generate_batch_number():
@@ -116,7 +127,11 @@ app.title("Batch Number Generator")
 app.geometry("250x220")  # Compact window size
 
 # Set application icon
-app.iconbitmap("app_icon.ico")  
+try:
+    icon_path = os.path.join(base_path, "app_icon.ico")
+    app.iconbitmap(icon_path)
+except Exception as e:
+    print(f"Warning: Unable to set application icon: {e}")
 
 # Widgets
 tk.Label(app, text="Product Type").grid(row=0, column=0, padx=5, pady=5, sticky="w")
